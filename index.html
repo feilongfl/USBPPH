@@ -1,22 +1,26 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>USBPPH 控制台</title>
   <style>
     :root {
-      --bg: #0b1020;
+      --bg: #070b16;
       --panel: rgba(255, 255, 255, 0.075);
-      --panel2: rgba(255, 255, 255, 0.11);
+      --panel-strong: rgba(255, 255, 255, 0.115);
       --border: rgba(255, 255, 255, 0.16);
-      --text: #f5f7fb;
-      --muted: #aab3c5;
-      --accent: #4f8cff;
-      --accent2: #22c55e;
-      --danger: #ef4444;
-      --warn: #f59e0b;
-      --shadow: 0 24px 70px rgba(0, 0, 0, 0.38);
+      --border-strong: rgba(255, 255, 255, 0.26);
+      --text: #f8fafc;
+      --muted: #aab4c8;
+      --muted2: #7c879b;
+      --blue: #4f8cff;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --purple: #8b5cf6;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
       --radius: 24px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
       --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -32,9 +36,9 @@
       font-family: var(--sans);
       color: var(--text);
       background:
-        radial-gradient(circle at 10% 10%, rgba(79, 140, 255, 0.28), transparent 30%),
-        radial-gradient(circle at 85% 5%, rgba(34, 197, 94, 0.18), transparent 28%),
-        radial-gradient(circle at 55% 90%, rgba(168, 85, 247, 0.16), transparent 30%),
+        radial-gradient(circle at 12% 8%, rgba(79, 140, 255, 0.26), transparent 30%),
+        radial-gradient(circle at 82% 6%, rgba(34, 197, 94, 0.14), transparent 26%),
+        radial-gradient(circle at 58% 92%, rgba(139, 92, 246, 0.16), transparent 30%),
         var(--bg);
     }
 
@@ -42,49 +46,47 @@
       color: inherit;
     }
 
-    .app {
-      width: min(1180px, calc(100% - 32px));
-      margin: 0 auto;
-      padding: 36px 0 56px;
+    code {
+      font-family: var(--mono);
     }
 
-    .hero {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 22px;
-      align-items: stretch;
-      margin-bottom: 22px;
+    .app {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 56px;
     }
 
     .card {
-      background: linear-gradient(180deg, var(--panel2), var(--panel));
+      background: linear-gradient(180deg, var(--panel-strong), var(--panel));
       border: 1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
     }
 
-    .hero-main {
-      padding: 32px;
+    .hero {
+      padding: 30px;
+      margin-bottom: 22px;
       position: relative;
       overflow: hidden;
     }
 
-    .hero-main::after {
+    .hero::after {
       content: "";
       position: absolute;
-      inset: auto -80px -120px auto;
-      width: 320px;
-      height: 320px;
+      right: -120px;
+      bottom: -140px;
+      width: 360px;
+      height: 360px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(79, 140, 255, 0.34), transparent 65%);
+      background: radial-gradient(circle, rgba(79, 140, 255, 0.34), transparent 66%);
       pointer-events: none;
     }
 
     .badge {
       display: inline-flex;
-      gap: 8px;
       align-items: center;
+      gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
       border: 1px solid var(--border);
@@ -98,150 +100,86 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: var(--danger);
-      box-shadow: 0 0 18px var(--danger);
+      background: var(--red);
+      box-shadow: 0 0 18px var(--red);
     }
 
     .dot.ok {
-      background: var(--accent2);
-      box-shadow: 0 0 18px var(--accent2);
+      background: var(--green);
+      box-shadow: 0 0 18px var(--green);
     }
 
     h1 {
       margin: 0;
       font-size: clamp(34px, 5vw, 58px);
-      letter-spacing: -0.045em;
       line-height: 0.98;
+      letter-spacing: -0.045em;
     }
 
     .subtitle {
-      max-width: 680px;
+      max-width: 820px;
       margin: 20px 0 0;
       color: var(--muted);
       font-size: 17px;
-      line-height: 1.65;
+      line-height: 1.7;
     }
 
-    .hero-side {
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .device-visual {
-      border-radius: 20px;
-      padding: 18px;
-      background: rgba(0, 0, 0, 0.2);
-      border: 1px solid var(--border);
-    }
-
-    .device-box {
-      height: 150px;
-      border-radius: 20px;
-      background:
-        linear-gradient(145deg, #20283b, #111827);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      position: relative;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,0.12),
-        0 18px 50px rgba(0,0,0,0.35);
-    }
-
-    .usb-row {
-      position: absolute;
-      bottom: 20px;
-      left: 18px;
-      right: 18px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .usb-port {
-      height: 32px;
-      border-radius: 8px;
-      background: #050816;
-      border: 1px solid rgba(255,255,255,0.28);
-      box-shadow: inset 0 0 0 3px rgba(255,255,255,0.05);
-    }
-
-    .led-row {
-      position: absolute;
-      top: 24px;
-      right: 22px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .led {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: #475569;
-      box-shadow: 0 0 14px rgba(148, 163, 184, 0.1);
-    }
-
-    .led.on {
-      background: var(--accent2);
-      box-shadow: 0 0 18px rgba(34, 197, 94, 0.8);
-    }
-
-    .actions {
+    .tabs {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 12px;
+      margin-bottom: 22px;
     }
 
-    button {
-      appearance: none;
-      border: 0;
-      border-radius: 16px;
-      padding: 13px 16px;
-      color: white;
-      background: rgba(255, 255, 255, 0.12);
+    .tab-button {
+      padding: 18px;
+      border-radius: 20px;
       border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.075);
+      color: var(--text);
       cursor: pointer;
-      font-weight: 700;
-      transition: transform 0.14s ease, background 0.14s ease, border 0.14s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: left;
+      transition: transform 0.14s ease, background 0.14s ease, border-color 0.14s ease;
     }
 
-    button:hover {
+    .tab-button:hover {
       transform: translateY(-1px);
-      background: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.11);
     }
 
-    button:active {
-      transform: translateY(0);
+    .tab-button.active {
+      border-color: rgba(79, 140, 255, 0.62);
+      background:
+        linear-gradient(135deg, rgba(79, 140, 255, 0.28), rgba(139, 92, 246, 0.12)),
+        rgba(255, 255, 255, 0.1);
     }
 
-    button.primary {
-      background: linear-gradient(135deg, var(--accent), #7c3aed);
-      border-color: rgba(255,255,255,0.22);
+    .tab-button strong {
+      font-size: 18px;
     }
 
-    button.good {
-      background: linear-gradient(135deg, #16a34a, #22c55e);
-      border-color: rgba(255,255,255,0.22);
+    .tab-button span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    button.danger {
-      background: linear-gradient(135deg, #dc2626, #f97316);
-      border-color: rgba(255,255,255,0.22);
+    .sheet {
+      display: none;
     }
 
-    button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
+    .sheet.active {
+      display: block;
     }
 
     .grid {
       display: grid;
-      grid-template-columns: 1fr 0.85fr;
+      grid-template-columns: 1fr 0.86fr;
       gap: 22px;
+      align-items: start;
     }
 
     .section {
@@ -254,6 +192,66 @@
       letter-spacing: -0.02em;
     }
 
+    .section h3 {
+      margin: 18px 0 10px;
+      font-size: 16px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 12px 15px;
+      color: white;
+      background: rgba(255, 255, 255, 0.11);
+      cursor: pointer;
+      font-weight: 760;
+      transition: transform 0.14s ease, background 0.14s ease, opacity 0.14s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.17);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .good {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .danger {
+      background: linear-gradient(135deg, #dc2626, #f97316);
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .small {
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
     .channels {
       display: grid;
       gap: 14px;
@@ -261,7 +259,7 @@
 
     .channel {
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr auto auto auto auto;
       gap: 10px;
       align-items: center;
       padding: 16px;
@@ -283,30 +281,25 @@
     .channel-title span {
       color: var(--muted);
       font-size: 13px;
+      line-height: 1.45;
     }
 
     .state-pill {
-      min-width: 70px;
+      min-width: 76px;
       text-align: center;
       padding: 7px 10px;
       border-radius: 999px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 850;
       background: rgba(148, 163, 184, 0.16);
       color: #cbd5e1;
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      border: 1px solid rgba(148, 163, 184, 0.22);
     }
 
     .state-pill.on {
       background: rgba(34, 197, 94, 0.14);
       color: #86efac;
-      border-color: rgba(34, 197, 94, 0.35);
-    }
-
-    .small {
-      padding: 9px 12px;
-      border-radius: 12px;
-      font-size: 13px;
+      border-color: rgba(34, 197, 94, 0.38);
     }
 
     .info-list {
@@ -316,7 +309,7 @@
 
     .info-row {
       display: grid;
-      grid-template-columns: 130px 1fr;
+      grid-template-columns: 138px 1fr;
       gap: 12px;
       padding: 12px;
       border-radius: 14px;
@@ -329,18 +322,17 @@
     }
 
     .info-row code {
-      font-family: var(--mono);
       color: #dbeafe;
       word-break: break-all;
     }
 
     .terminal {
-      height: 230px;
+      height: 260px;
       overflow: auto;
       padding: 14px;
       border-radius: 18px;
-      background: #050816;
-      border: 1px solid rgba(255,255,255,0.14);
+      background: #030712;
+      border: 1px solid rgba(255, 255, 255, 0.14);
       font-family: var(--mono);
       font-size: 13px;
       color: #dbeafe;
@@ -348,7 +340,7 @@
       white-space: pre-wrap;
     }
 
-    .cmd {
+    .cmd-row {
       display: flex;
       gap: 10px;
       margin-top: 12px;
@@ -357,7 +349,7 @@
     input {
       width: 100%;
       border: 1px solid var(--border);
-      background: rgba(0,0,0,0.22);
+      background: rgba(0, 0, 0, 0.22);
       color: var(--text);
       border-radius: 14px;
       padding: 12px 14px;
@@ -366,18 +358,18 @@
     }
 
     input:focus {
-      border-color: rgba(79, 140, 255, 0.7);
+      border-color: rgba(79, 140, 255, 0.72);
       box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.18);
     }
 
-    .docs {
+    .protocol {
       margin-top: 22px;
-      padding: 26px;
+      padding: 24px;
     }
 
-    .docs-grid {
+    .protocol-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 14px;
       margin-top: 14px;
     }
@@ -385,39 +377,103 @@
     .doc {
       padding: 18px;
       border-radius: 18px;
-      background: rgba(0,0,0,0.18);
+      background: rgba(0, 0, 0, 0.2);
       border: 1px solid var(--border);
     }
 
     .doc h3 {
-      margin: 0 0 10px;
-      font-size: 16px;
+      margin-top: 0;
     }
 
-    .doc p, .doc li {
+    .doc p,
+    .doc li {
       color: var(--muted);
       font-size: 14px;
-      line-height: 1.65;
+      line-height: 1.7;
     }
 
-    .doc ul {
+    .doc ul,
+    .doc ol {
       margin: 0;
-      padding-left: 18px;
+      padding-left: 19px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.22);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      padding: 11px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: #dbeafe;
+      background: rgba(255, 255, 255, 0.06);
+      font-weight: 800;
+    }
+
+    td {
+      color: var(--muted);
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      border-radius: 14px;
+      background: #030712;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #dbeafe;
+      overflow: auto;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.55;
     }
 
     .warn {
       color: #fcd34d;
     }
 
+    .mode-lock {
+      margin-bottom: 14px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.24);
+      color: #fde68a;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
     .footer {
       margin-top: 20px;
-      color: var(--muted);
+      color: var(--muted2);
       font-size: 13px;
       text-align: center;
     }
 
-    @media (max-width: 900px) {
-      .hero, .grid, .docs-grid {
+    @media (max-width: 960px) {
+
+      .tabs,
+      .grid,
+      .protocol-grid {
         grid-template-columns: 1fr;
       }
 
@@ -425,8 +481,8 @@
         grid-template-columns: 1fr;
       }
 
-      .actions {
-        grid-template-columns: 1fr;
+      .cmd-row {
+        flex-direction: column;
       }
 
       .info-row {
@@ -435,197 +491,580 @@
     }
   </style>
 </head>
+
 <body>
   <main class="app">
-    <section class="hero">
-      <div class="card hero-main">
-        <div class="badge">
-          <span id="status-dot" class="dot"></span>
-          <span id="status-text">未连接设备</span>
-        </div>
-        <h1>USBPPH 控制台</h1>
-        <p class="subtitle">
-          用于控制 USBPPH 可编程 USB 控制器。网页可通过 WebUSB 直接控制通道开关，也可通过 Web Serial 发送
-          SCPI / IEEE-488.2 风格命令检查版本号与执行调试操作。
-        </p>
+    <section class="card hero">
+      <div class="badge">
+        <span id="status-dot" class="dot"></span>
+        <span id="status-text">未连接设备</span>
       </div>
+      <h1>USBPPH 控制台</h1>
+      <p class="subtitle">
+        静态 SPA 页面，可直接托管在 GitHub Pages。页面提供两种互斥连接方式：
+        使用 WebUSB 直接发送 USB Vendor Request，或使用 Web Serial 通过 CDC ACM 串口发送 SCPI / IEEE-488.2 风格命令。
+      </p>
+    </section>
 
-      <div class="card hero-side">
-        <div class="device-visual">
-          <div class="device-box">
-            <div class="led-row">
-              <span id="led-0" class="led"></span>
-              <span id="led-1" class="led"></span>
-              <span id="led-2" class="led"></span>
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="usb">
+        <strong>使用 USB 连接</strong>
+        <span>通过 WebUSB 发送 EP0 Vendor Request，适合浏览器直接控制通道开关。</span>
+      </button>
+      <button class="tab-button" data-tab="serial">
+        <strong>使用串口连接</strong>
+        <span>通过 CDC ACM 虚拟串口发送 SCPI 命令，适合脚本、终端和自动化工具。</span>
+      </button>
+    </nav>
+
+    <section id="sheet-usb" class="sheet active">
+      <div class="grid">
+        <div class="card section">
+          <h2>USB 连接控制</h2>
+          <div class="mode-lock">
+            USB 与串口采用互斥模式。点击「连接 WebUSB」时，页面会先断开当前串口连接，避免同一设备被两个浏览器 API 同时占用。
+          </div>
+
+          <div class="toolbar">
+            <button class="primary" id="usb-connect">连接 WebUSB</button>
+            <button id="usb-refresh">刷新状态</button>
+            <button class="good" id="usb-all-on">全部 ON</button>
+            <button class="danger" id="usb-all-off">全部 OFF</button>
+            <button class="danger" id="usb-disconnect">断开 USB</button>
+          </div>
+
+          <div class="channels">
+            <div class="channel">
+              <div class="channel-title">
+                <strong>Port 1</strong>
+                <span>Vendor channel 0，通常用于 USB 数据 + 电源模拟插拔。</span>
+              </div>
+              <span id="usb-state-0" class="state-pill">UNKNOWN</span>
+              <button class="small good" data-usb-on="0">ON</button>
+              <button class="small danger" data-usb-off="0">OFF</button>
+              <button class="small" data-usb-toggle="0">TOGGLE</button>
+              <button class="small" data-usb-read="0">READ</button>
             </div>
-            <div class="usb-row">
-              <span class="usb-port"></span>
-              <span class="usb-port"></span>
-              <span class="usb-port"></span>
+
+            <div class="channel">
+              <div class="channel-title">
+                <strong>Port 2</strong>
+                <span>Vendor channel 1，通常用于电源通道控制。</span>
+              </div>
+              <span id="usb-state-1" class="state-pill">UNKNOWN</span>
+              <button class="small good" data-usb-on="1">ON</button>
+              <button class="small danger" data-usb-off="1">OFF</button>
+              <button class="small" data-usb-toggle="1">TOGGLE</button>
+              <button class="small" data-usb-read="1">READ</button>
+            </div>
+
+            <div class="channel">
+              <div class="channel-title">
+                <strong>Port 3</strong>
+                <span>Vendor channel 2，通常用于电源通道控制。</span>
+              </div>
+              <span id="usb-state-2" class="state-pill">UNKNOWN</span>
+              <button class="small good" data-usb-on="2">ON</button>
+              <button class="small danger" data-usb-off="2">OFF</button>
+              <button class="small" data-usb-toggle="2">TOGGLE</button>
+              <button class="small" data-usb-read="2">READ</button>
             </div>
           </div>
         </div>
 
-        <div class="actions">
-          <button class="primary" id="btn-connect-usb">连接 WebUSB</button>
-          <button id="btn-connect-serial">连接串口</button>
-          <button id="btn-refresh">刷新状态</button>
-          <button class="danger" id="btn-disconnect">断开</button>
+        <div class="card section">
+          <h2>USB 设备信息</h2>
+          <div class="info-list">
+            <div class="info-row">
+              <span>连接状态</span>
+              <code id="usb-info-status">未连接</code>
+            </div>
+            <div class="info-row">
+              <span>VID / PID</span>
+              <code>0x1209 / 0x0034</code>
+            </div>
+            <div class="info-row">
+              <span>Manufacturer</span>
+              <code id="usb-info-manufacturer">-</code>
+            </div>
+            <div class="info-row">
+              <span>Product</span>
+              <code id="usb-info-product">-</code>
+            </div>
+            <div class="info-row">
+              <span>Serial</span>
+              <code id="usb-info-serial">-</code>
+            </div>
+          </div>
+
+          <h3>USB 日志</h3>
+          <div id="usb-log" class="terminal"></div>
         </div>
+      </div>
+
+      <div class="card protocol">
+        <h2>USB 协议说明</h2>
+        <div class="protocol-grid">
+          <div class="doc">
+            <h3>1. 连接方式</h3>
+            <p>
+              USB 模式使用浏览器的 WebUSB API。页面通过 <code>navigator.usb.requestDevice()</code>
+              查找 <code>VID=0x1209</code>、<code>PID=0x0034</code> 的 USBPPH 设备。
+              控制通道时不需要 claim CDC interface，因为控制命令走 EP0 vendor request。
+            </p>
+            <p>
+              WebUSB 只能在安全上下文中使用，即 <code>https://</code> 或 <code>localhost</code>。
+              GitHub Pages 默认使用 HTTPS，因此适合部署该页面。
+            </p>
+          </div>
+
+          <div class="doc">
+            <h3>2. 通道编号</h3>
+            <p>
+              USB vendor request 使用从 0 开始的通道编号：
+            </p>
+            <ul>
+              <li><code>wIndex = 0</code>：Port 1 / P1.5</li>
+              <li><code>wIndex = 1</code>：Port 2 / P1.6</li>
+              <li><code>wIndex = 2</code>：Port 3 / P1.7</li>
+            </ul>
+            <p>
+              页面显示的 Port 1/2/3 是用户语义；底层 USB 协议仍使用 channel 0/1/2。
+            </p>
+          </div>
+        </div>
+
+        <h3>3. GPIO_WRITE：设置通道状态</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>字段</th>
+                <th>值</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>bmRequestType</code></td>
+                <td><code>0x40</code></td>
+                <td>Vendor / Host-to-device / Device recipient</td>
+              </tr>
+              <tr>
+                <td><code>bRequest</code></td>
+                <td><code>0x30</code></td>
+                <td>USBPPH_VENDOR_GPIO_WRITE</td>
+              </tr>
+              <tr>
+                <td><code>wIndex</code></td>
+                <td><code>0, 1, 2</code></td>
+                <td>通道编号。0=Port1，1=Port2，2=Port3</td>
+              </tr>
+              <tr>
+                <td><code>wValue</code></td>
+                <td><code>0, 1, 3</code></td>
+                <td><code>0=OFF</code>，<code>1=ON</code>，<code>3=TOGGLE</code></td>
+              </tr>
+              <tr>
+                <td><code>wLength</code></td>
+                <td><code>0</code></td>
+                <td>无数据阶段</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>4. GPIO_READ：读取通道状态</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>字段</th>
+                <th>值</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>bmRequestType</code></td>
+                <td><code>0xC0</code></td>
+                <td>Vendor / Device-to-host / Device recipient</td>
+              </tr>
+              <tr>
+                <td><code>bRequest</code></td>
+                <td><code>0x31</code></td>
+                <td>USBPPH_VENDOR_GPIO_READ</td>
+              </tr>
+              <tr>
+                <td><code>wIndex</code></td>
+                <td><code>0, 1, 2</code></td>
+                <td>通道编号</td>
+              </tr>
+              <tr>
+                <td><code>wValue</code></td>
+                <td><code>0</code></td>
+                <td>忽略</td>
+              </tr>
+              <tr>
+                <td><code>wLength</code></td>
+                <td><code>1</code></td>
+                <td>返回 1 字节：<code>0=OFF</code>，<code>1=ON</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>5. WebUSB 描述符请求</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>用途</th>
+                <th>字段</th>
+                <th>值</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>WebUSB URL</td>
+                <td><code>bRequest</code></td>
+                <td><code>0x22</code></td>
+                <td>WEBUSB_VENDOR_CODE</td>
+              </tr>
+              <tr>
+                <td>WebUSB URL</td>
+                <td><code>wValue</code></td>
+                <td><code>0x0001</code></td>
+                <td>Landing Page index</td>
+              </tr>
+              <tr>
+                <td>WebUSB URL</td>
+                <td><code>wIndex</code></td>
+                <td><code>0x0002</code></td>
+                <td>WEBUSB_GET_URL</td>
+              </tr>
+              <tr>
+                <td>Microsoft OS 2.0</td>
+                <td><code>bRequest</code></td>
+                <td><code>0x21</code></td>
+                <td>MS_OS_20_VENDOR_CODE</td>
+              </tr>
+              <tr>
+                <td>Microsoft OS 2.0</td>
+                <td><code>wIndex</code></td>
+                <td><code>0x0007</code></td>
+                <td>MS_OS_20_DESC_INDEX</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>6. USB 控制示例</h3>
+        <pre>// Port 1 ON
+device.controlTransferOut({
+  requestType: "vendor",
+  recipient: "device",
+  request: 0x30,
+  value: 1,
+  index: 0
+});
+
+// Port 1 read
+const r = await device.controlTransferIn({
+  requestType: "vendor",
+  recipient: "device",
+  request: 0x31,
+  value: 0,
+  index: 0
+}, 1);
+
+// r.data.getUint8(0) == 0 OFF, 1 ON</pre>
       </div>
     </section>
 
-    <section class="grid">
-      <div class="card section">
-        <h2>通道控制</h2>
-        <div class="channels">
-          <div class="channel">
-            <div class="channel-title">
-              <strong>Port 1</strong>
-              <span>支持 USB 数据 + 电源模拟插拔</span>
-            </div>
-            <span id="state-0" class="state-pill">UNKNOWN</span>
-            <button class="small good" data-on="0">ON</button>
-            <button class="small danger" data-off="0">OFF</button>
-            <button class="small" data-toggle="0">TOGGLE</button>
+    <section id="sheet-serial" class="sheet">
+      <div class="grid">
+        <div class="card section">
+          <h2>串口连接控制</h2>
+          <div class="mode-lock">
+            USB 与串口采用互斥模式。点击「连接 CDC 串口」时，页面会先断开当前 WebUSB 连接，避免同一设备被两个接口同时操作。
           </div>
 
-          <div class="channel">
-            <div class="channel-title">
-              <strong>Port 2</strong>
-              <span>电源通道控制</span>
-            </div>
-            <span id="state-1" class="state-pill">UNKNOWN</span>
-            <button class="small good" data-on="1">ON</button>
-            <button class="small danger" data-off="1">OFF</button>
-            <button class="small" data-toggle="1">TOGGLE</button>
+          <div class="toolbar">
+            <button class="primary" id="serial-connect">连接 CDC 串口</button>
+            <button id="serial-idn">检查版本号 *IDN?</button>
+            <button id="serial-query-all">查询 OUTP:ALL?</button>
+            <button class="good" id="serial-all-on">全部 ON</button>
+            <button class="danger" id="serial-all-off">全部 OFF</button>
+            <button class="danger" id="serial-disconnect">断开串口</button>
           </div>
 
-          <div class="channel">
-            <div class="channel-title">
-              <strong>Port 3</strong>
-              <span>电源通道控制</span>
+          <div class="channels">
+            <div class="channel">
+              <div class="channel-title">
+                <strong>Port 1</strong>
+                <span>SCPI 通道 1，对应底层 P1.5。</span>
+              </div>
+              <span id="serial-state-0" class="state-pill">UNKNOWN</span>
+              <button class="small good" data-serial-cmd="OUTP1 ON">ON</button>
+              <button class="small danger" data-serial-cmd="OUTP1 OFF">OFF</button>
+              <button class="small" data-serial-cmd="OUTP1 TOG">TOGGLE</button>
+              <button class="small" data-serial-cmd="OUTP1?">READ</button>
             </div>
-            <span id="state-2" class="state-pill">UNKNOWN</span>
-            <button class="small good" data-on="2">ON</button>
-            <button class="small danger" data-off="2">OFF</button>
-            <button class="small" data-toggle="2">TOGGLE</button>
+
+            <div class="channel">
+              <div class="channel-title">
+                <strong>Port 2</strong>
+                <span>SCPI 通道 2，对应底层 P1.6。</span>
+              </div>
+              <span id="serial-state-1" class="state-pill">UNKNOWN</span>
+              <button class="small good" data-serial-cmd="OUTP2 ON">ON</button>
+              <button class="small danger" data-serial-cmd="OUTP2 OFF">OFF</button>
+              <button class="small" data-serial-cmd="OUTP2 TOG">TOGGLE</button>
+              <button class="small" data-serial-cmd="OUTP2?">READ</button>
+            </div>
+
+            <div class="channel">
+              <div class="channel-title">
+                <strong>Port 3</strong>
+                <span>SCPI 通道 3，对应底层 P1.7。</span>
+              </div>
+              <span id="serial-state-2" class="state-pill">UNKNOWN</span>
+              <button class="small good" data-serial-cmd="OUTP3 ON">ON</button>
+              <button class="small danger" data-serial-cmd="OUTP3 OFF">OFF</button>
+              <button class="small" data-serial-cmd="OUTP3 TOG">TOGGLE</button>
+              <button class="small" data-serial-cmd="OUTP3?">READ</button>
+            </div>
           </div>
         </div>
 
-        <div class="actions" style="margin-top: 14px;">
-          <button class="good" id="btn-all-on">全部 ON</button>
-          <button class="danger" id="btn-all-off">全部 OFF</button>
+        <div class="card section">
+          <h2>串口设备信息</h2>
+          <div class="info-list">
+            <div class="info-row">
+              <span>连接状态</span>
+              <code id="serial-info-status">未连接</code>
+            </div>
+            <div class="info-row">
+              <span>默认参数</span>
+              <code>115200, 8N1, no flow control</code>
+            </div>
+            <div class="info-row">
+              <span>Firmware</span>
+              <code id="serial-info-firmware">-</code>
+            </div>
+            <div class="info-row">
+              <span>最后响应</span>
+              <code id="serial-info-last">-</code>
+            </div>
+          </div>
+
+          <h3>命令终端</h3>
+          <div id="serial-log" class="terminal"></div>
+          <div class="cmd-row">
+            <input id="serial-input" placeholder="输入命令，例如：*IDN?、OUTP1 ON、OUTP:ALL?、SYST:ERR?" />
+            <button class="primary" id="serial-send">发送</button>
+          </div>
         </div>
       </div>
 
-      <div class="card section">
-        <h2>设备信息</h2>
-        <div class="info-list">
-          <div class="info-row">
-            <span>USB 连接</span>
-            <code id="info-usb">未连接</code>
+      <div class="card protocol">
+        <h2>串口协议说明</h2>
+        <div class="protocol-grid">
+          <div class="doc">
+            <h3>1. 连接方式</h3>
+            <p>
+              串口模式使用浏览器的 Web Serial API。设备固件枚举为 USB CDC ACM 虚拟串口。
+              Windows 下表现为 COMx，Linux 下通常为 <code>/dev/ttyACM*</code> 或类似设备，macOS 下通常为
+              <code>/dev/cu.usbmodem*</code>。
+            </p>
+            <p>
+              页面默认使用 <code>115200 8N1</code> 打开串口。USB CDC 的波特率参数主要用于主机兼容性；
+              实际 USB 传输不依赖传统 UART 波特率。
+            </p>
           </div>
-          <div class="info-row">
-            <span>串口连接</span>
-            <code id="info-serial">未连接</code>
-          </div>
-          <div class="info-row">
-            <span>Manufacturer</span>
-            <code id="info-manufacturer">-</code>
-          </div>
-          <div class="info-row">
-            <span>Product</span>
-            <code id="info-product">-</code>
-          </div>
-          <div class="info-row">
-            <span>Serial</span>
-            <code id="info-serialno">-</code>
-          </div>
-          <div class="info-row">
-            <span>Firmware</span>
-            <code id="info-firmware">-</code>
+
+          <div class="doc">
+            <h3>2. 帧格式</h3>
+            <ul>
+              <li>命令使用 ASCII 文本。</li>
+              <li>每条命令以 <code>\n</code> 或 <code>\r\n</code> 结束。</li>
+              <li>命令不区分大小写，固件内部会转换为大写处理。</li>
+              <li>正常控制命令通常返回 <code>OK</code>。</li>
+              <li>查询命令返回文本值，例如 <code>1</code>、<code>0,1,0</code> 或 <code>*IDN?</code> 的设备识别字符串。</li>
+              <li>错误命令返回 <code>ERR</code>，详细错误可通过 <code>SYST:ERR?</code> 查询。</li>
+            </ul>
           </div>
         </div>
 
-        <div class="actions" style="margin-top: 14px;">
-          <button class="primary" id="btn-idn">检查版本号 *IDN?</button>
-          <button id="btn-clear-log">清空日志</button>
+        <h3>3. IEEE-488.2 基础命令</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>命令</th>
+                <th>类型</th>
+                <th>返回</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>*IDN?</code></td>
+                <td>查询</td>
+                <td><code>feilong,USBPPH,&lt;serial&gt;,&lt;version&gt;</code></td>
+                <td>读取制造商、产品名、芯片序列号和固件版本。</td>
+              </tr>
+              <tr>
+                <td><code>*RST</code></td>
+                <td>控制</td>
+                <td><code>OK</code></td>
+                <td>复位逻辑输出状态，所有通道关闭。</td>
+              </tr>
+              <tr>
+                <td><code>*CLS</code></td>
+                <td>控制</td>
+                <td><code>OK</code></td>
+                <td>清除错误状态。</td>
+              </tr>
+              <tr>
+                <td><code>*OPC?</code></td>
+                <td>查询</td>
+                <td><code>1</code></td>
+                <td>Operation Complete 查询。当前实现中立即返回 1。</td>
+              </tr>
+              <tr>
+                <td><code>SYST:ERR?</code></td>
+                <td>查询</td>
+                <td><code>+0,"No error"</code> 或错误信息</td>
+                <td>查询并弹出最近一次错误状态。</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-      </div>
-    </section>
 
-    <section class="card section" style="margin-top: 22px;">
-      <h2>命令终端</h2>
-      <div id="terminal" class="terminal"></div>
-      <div class="cmd">
-        <input id="cmd-input" placeholder="输入命令，例如：*IDN?、OUTP1 ON、OUTP:ALL?、SYST:ERR?" />
-        <button class="primary" id="btn-send-cmd">发送</button>
-      </div>
-    </section>
+        <h3>4. OUTP 通道命令</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>命令</th>
+                <th>返回</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>OUTP?</code></td>
+                <td><code>0,1,0</code></td>
+                <td>读取全部通道状态，顺序为 Port1,Port2,Port3。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP:ALL?</code></td>
+                <td><code>0,1,0</code></td>
+                <td>同 <code>OUTP?</code>。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP:ALL ON</code></td>
+                <td><code>OK</code></td>
+                <td>打开全部通道。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP:ALL OFF</code></td>
+                <td><code>OK</code></td>
+                <td>关闭全部通道。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP:ALL TOG</code></td>
+                <td><code>OK</code></td>
+                <td>翻转全部通道状态。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP1?</code></td>
+                <td><code>0</code> 或 <code>1</code></td>
+                <td>读取 Port 1 状态。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP1 ON</code></td>
+                <td><code>OK</code></td>
+                <td>打开 Port 1。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP2 OFF</code></td>
+                <td><code>OK</code></td>
+                <td>关闭 Port 2。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP3 TOG</code></td>
+                <td><code>OK</code></td>
+                <td>翻转 Port 3。</td>
+              </tr>
+              <tr>
+                <td><code>OUTP 1,ON</code></td>
+                <td><code>OK</code></td>
+                <td>兼容带空格和逗号的写法。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-    <section class="card docs">
-      <h2>设备使用说明</h2>
-      <div class="docs-grid">
+        <h3>5. ROUT 路由命令</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>命令</th>
+                <th>返回</th>
+                <th>说明</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>ROUT:CLOS (@1)</code></td>
+                <td><code>OK</code></td>
+                <td>闭合 Port 1。等效于 <code>OUTP1 ON</code>。</td>
+              </tr>
+              <tr>
+                <td><code>ROUT:OPEN (@1)</code></td>
+                <td><code>OK</code></td>
+                <td>断开 Port 1。等效于 <code>OUTP1 OFF</code>。</td>
+              </tr>
+              <tr>
+                <td><code>ROUT:CLOS? (@1)</code></td>
+                <td><code>0</code> 或 <code>1</code></td>
+                <td>查询 Port 1 是否闭合。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>6. 串口控制示例</h3>
+        <pre>*IDN?
+OUTP:ALL?
+OUTP1 ON
+OUTP2 OFF
+OUTP3 TOG
+ROUT:CLOS (@1)
+ROUT:OPEN (@1)
+SYST:ERR?</pre>
+
+        <h3>7. 状态与物理电平</h3>
         <div class="doc">
-          <h3>1. 浏览器要求</h3>
-          <ul>
-            <li>网页需要通过 HTTPS 打开，GitHub Pages 满足该条件。</li>
-            <li>WebUSB 用于直接控制通道开关。</li>
-            <li>Web Serial 用于通过 CDC 串口发送 SCPI 命令。</li>
-            <li>部分移动端浏览器可能不支持 WebUSB 或 Web Serial。</li>
-          </ul>
-        </div>
-
-        <div class="doc">
-          <h3>2. 基本操作</h3>
-          <ul>
-            <li>点击「连接 WebUSB」授权 USBPPH 设备。</li>
-            <li>点击「刷新状态」读取三个通道当前状态。</li>
-            <li>点击每个通道的 ON / OFF / TOGGLE 控制输出。</li>
-            <li>点击「连接串口」后可使用命令终端。</li>
-          </ul>
-        </div>
-
-        <div class="doc">
-          <h3>3. 常用命令</h3>
-          <ul>
-            <li><code>*IDN?</code>：读取设备型号、序列号、固件版本。</li>
-            <li><code>OUTP:ALL?</code>：读取全部通道状态。</li>
-            <li><code>OUTP1 ON</code>：打开 1 通道。</li>
-            <li><code>OUTP2 OFF</code>：关闭 2 通道。</li>
-            <li><code>ROUT:CLOS (@1)</code>：闭合 1 通道。</li>
-            <li><code>ROUT:OPEN (@1)</code>：断开 1 通道。</li>
-          </ul>
-        </div>
-
-        <div class="doc">
-          <h3>4. 通道语义</h3>
           <p>
-            页面显示的是逻辑状态，不是 GPIO 物理电平。固件内部为 active-low：
-            逻辑 ON 对应 GPIO 低电平，逻辑 OFF 对应 GPIO 高电平。
+            页面、USB 协议和串口协议显示的是逻辑状态：
+            <code>1</code> 表示逻辑 ON，<code>0</code> 表示逻辑 OFF。
           </p>
-        </div>
-
-        <div class="doc">
-          <h3>5. Windows COM 号</h3>
           <p>
-            固件通过芯片唯一 ID 生成稳定 USB 序列号。同一台 Windows 电脑通常会为同一个序列号保持相同 COM 号。
-            若要强制指定 COM 号，需要 Windows 侧设备管理器或脚本处理。
-          </p>
-        </div>
-
-        <div class="doc">
-          <h3>6. 安全提示</h3>
-          <p class="warn">
-            控制外接设备时，先确认电源容量、接线方向和负载电流。调试未知设备时建议先关闭所有通道，再逐个打开。
+            硬件为 active-low：逻辑 ON 时 GPIO 输出低电平；逻辑 OFF 时 GPIO 输出高电平。
+            因此不要用 GPIO 物理电平直接理解页面上的 ON/OFF。
           </p>
         </div>
       </div>
     </section>
 
     <div class="footer">
-      USBPPH Web Console · Static SPA · GitHub Pages Ready
+      USBPPH Web Console · Single-file SPA · WebUSB / Web Serial mutually exclusive
     </div>
   </main>
 
@@ -648,11 +1087,15 @@
     };
 
     const state = {
+      activeTab: "usb",
       usbDevice: null,
+      usbChannelState: [null, null, null],
+
       serialPort: null,
       serialReader: null,
       serialWriter: null,
-      channelState: [null, null, null],
+      serialChannelState: [null, null, null],
+      serialLineBuffer: "",
     };
 
     const $ = (id) => document.getElementById(id);
@@ -661,60 +1104,67 @@
       statusDot: $("status-dot"),
       statusText: $("status-text"),
 
-      btnConnectUsb: $("btn-connect-usb"),
-      btnConnectSerial: $("btn-connect-serial"),
-      btnDisconnect: $("btn-disconnect"),
-      btnRefresh: $("btn-refresh"),
-      btnAllOn: $("btn-all-on"),
-      btnAllOff: $("btn-all-off"),
-      btnIdn: $("btn-idn"),
-      btnClearLog: $("btn-clear-log"),
-      btnSendCmd: $("btn-send-cmd"),
+      usbInfoStatus: $("usb-info-status"),
+      usbInfoManufacturer: $("usb-info-manufacturer"),
+      usbInfoProduct: $("usb-info-product"),
+      usbInfoSerial: $("usb-info-serial"),
+      usbLog: $("usb-log"),
 
-      infoUsb: $("info-usb"),
-      infoSerial: $("info-serial"),
-      infoManufacturer: $("info-manufacturer"),
-      infoProduct: $("info-product"),
-      infoSerialNo: $("info-serialno"),
-      infoFirmware: $("info-firmware"),
-
-      terminal: $("terminal"),
-      cmdInput: $("cmd-input"),
+      serialInfoStatus: $("serial-info-status"),
+      serialInfoFirmware: $("serial-info-firmware"),
+      serialInfoLast: $("serial-info-last"),
+      serialLog: $("serial-log"),
+      serialInput: $("serial-input"),
     };
 
-    function log(message, type = "info") {
+    function logTo(target, message, type = "info") {
+      const box = target === "usb" ? el.usbLog : el.serialLog;
       const ts = new Date().toLocaleTimeString();
-      const prefix = type === "error" ? "ERR" : type === "rx" ? "RX " : type === "tx" ? "TX " : "LOG";
-      el.terminal.textContent += `[${ts}] ${prefix}: ${message}\n`;
-      el.terminal.scrollTop = el.terminal.scrollHeight;
+      const prefix =
+        type === "error" ? "ERR" :
+          type === "rx" ? "RX " :
+            type === "tx" ? "TX " :
+              "LOG";
+
+      box.textContent += `[${ts}] ${prefix}: ${message}\n`;
+      box.scrollTop = box.scrollHeight;
     }
 
-    function setStatus(connected, text) {
-      el.statusDot.classList.toggle("ok", connected);
-      el.statusText.textContent = text;
+    function setGlobalStatus() {
+      const connectedUsb = Boolean(state.usbDevice);
+      const connectedSerial = Boolean(state.serialPort);
+
+      el.statusDot.classList.toggle("ok", connectedUsb || connectedSerial);
+
+      if (connectedUsb) {
+        el.statusText.textContent = "WebUSB 已连接";
+      } else if (connectedSerial) {
+        el.statusText.textContent = "CDC 串口已连接";
+      } else {
+        el.statusText.textContent = "未连接设备";
+      }
     }
 
-    function updateInfo() {
-      const usb = state.usbDevice;
-      el.infoUsb.textContent = usb ? "已连接 WebUSB" : "未连接";
-      el.infoSerial.textContent = state.serialPort ? "已连接 CDC 串口" : "未连接";
-
-      el.infoManufacturer.textContent = usb?.manufacturerName || "-";
-      el.infoProduct.textContent = usb?.productName || "-";
-      el.infoSerialNo.textContent = usb?.serialNumber || "-";
-
-      const connected = Boolean(state.usbDevice || state.serialPort);
-      setStatus(connected, connected ? "设备已连接" : "未连接设备");
+    function updateUsbInfo() {
+      const d = state.usbDevice;
+      el.usbInfoStatus.textContent = d ? "已连接 WebUSB" : "未连接";
+      el.usbInfoManufacturer.textContent = d?.manufacturerName || "-";
+      el.usbInfoProduct.textContent = d?.productName || "-";
+      el.usbInfoSerial.textContent = d?.serialNumber || "-";
+      setGlobalStatus();
     }
 
-    function updateChannelUI() {
+    function updateSerialInfo() {
+      el.serialInfoStatus.textContent = state.serialPort ? "已连接 CDC 串口" : "未连接";
+      setGlobalStatus();
+    }
+
+    function updateUsbChannelUI() {
       for (let i = 0; i < 3; i++) {
-        const value = state.channelState[i];
-        const pill = $(`state-${i}`);
-        const led = $(`led-${i}`);
+        const value = state.usbChannelState[i];
+        const pill = $(`usb-state-${i}`);
 
         pill.classList.toggle("on", value === 1);
-        led.classList.toggle("on", value === 1);
 
         if (value === 1) {
           pill.textContent = "ON";
@@ -726,28 +1176,120 @@
       }
     }
 
+    function updateSerialChannelUI() {
+      for (let i = 0; i < 3; i++) {
+        const value = state.serialChannelState[i];
+        const pill = $(`serial-state-${i}`);
+
+        pill.classList.toggle("on", value === 1);
+
+        if (value === 1) {
+          pill.textContent = "ON";
+        } else if (value === 0) {
+          pill.textContent = "OFF";
+        } else {
+          pill.textContent = "UNKNOWN";
+        }
+      }
+    }
+
+    function setTab(tab) {
+      state.activeTab = tab;
+
+      document.querySelectorAll(".tab-button").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.tab === tab);
+      });
+
+      document.querySelectorAll(".sheet").forEach(sheet => {
+        sheet.classList.remove("active");
+      });
+
+      $(`sheet-${tab}`).classList.add("active");
+    }
+
     function assertWebUsb() {
       if (!("usb" in navigator)) {
-        throw new Error("当前浏览器不支持 WebUSB。请使用支持 WebUSB 的 Chromium 系浏览器。");
+        throw new Error("当前浏览器不支持 WebUSB。请使用支持 WebUSB 的 Chromium 系浏览器，并通过 HTTPS 打开页面。");
       }
     }
 
     function assertWebSerial() {
       if (!("serial" in navigator)) {
-        throw new Error("当前浏览器不支持 Web Serial。请使用支持 Web Serial 的 Chromium 系浏览器。");
+        throw new Error("当前浏览器不支持 Web Serial。请使用支持 Web Serial 的 Chromium 系浏览器，并通过 HTTPS 打开页面。");
       }
+    }
+
+    async function disconnectUsb() {
+      if (state.usbDevice) {
+        try {
+          await state.usbDevice.close();
+        } catch (_) { }
+      }
+
+      state.usbDevice = null;
+      state.usbChannelState = [null, null, null];
+
+      updateUsbInfo();
+      updateUsbChannelUI();
+    }
+
+    async function disconnectSerial() {
+      if (state.serialReader) {
+        try {
+          await state.serialReader.cancel();
+        } catch (_) { }
+        try {
+          state.serialReader.releaseLock();
+        } catch (_) { }
+        state.serialReader = null;
+      }
+
+      if (state.serialWriter) {
+        try {
+          state.serialWriter.releaseLock();
+        } catch (_) { }
+        state.serialWriter = null;
+      }
+
+      if (state.serialPort) {
+        try {
+          await state.serialPort.close();
+        } catch (_) { }
+      }
+
+      state.serialPort = null;
+      state.serialLineBuffer = "";
+      state.serialChannelState = [null, null, null];
+
+      updateSerialInfo();
+      updateSerialChannelUI();
+    }
+
+    async function enterUsbMode() {
+      if (state.serialPort) {
+        logTo("serial", "因为即将连接 WebUSB，已自动断开 CDC 串口。");
+        await disconnectSerial();
+      }
+      setTab("usb");
+    }
+
+    async function enterSerialMode() {
+      if (state.usbDevice) {
+        logTo("usb", "因为即将连接 CDC 串口，已自动断开 WebUSB。");
+        await disconnectUsb();
+      }
+      setTab("serial");
     }
 
     async function connectUsb() {
       assertWebUsb();
+      await enterUsbMode();
 
       const device = await navigator.usb.requestDevice({
-        filters: [
-          {
-            vendorId: USBPPH.vid,
-            productId: USBPPH.pid,
-          },
-        ],
+        filters: [{
+          vendorId: USBPPH.vid,
+          productId: USBPPH.pid,
+        }],
       });
 
       await device.open();
@@ -757,24 +1299,10 @@
       }
 
       state.usbDevice = device;
+      updateUsbInfo();
 
-      updateInfo();
-      log(`WebUSB 已连接：${device.productName || "USBPPH"} / Serial=${device.serialNumber || "-"}`);
-
-      await refreshAllChannels();
-    }
-
-    async function disconnectUsb() {
-      if (state.usbDevice) {
-        try {
-          await state.usbDevice.close();
-        } catch (_) {}
-        state.usbDevice = null;
-      }
-
-      state.channelState = [null, null, null];
-      updateChannelUI();
-      updateInfo();
+      logTo("usb", `已连接 WebUSB：${device.productName || "USBPPH"}，Serial=${device.serialNumber || "-"}`);
+      await refreshAllUsbChannels();
     }
 
     async function usbControlOut(request, value, index) {
@@ -815,46 +1343,48 @@
       return new Uint8Array(result.data.buffer);
     }
 
-    async function setChannel(channel, value) {
+    async function setUsbChannel(channel, value) {
       await usbControlOut(USBPPH.REQ_GPIO_WRITE, value, channel);
-      await refreshChannel(channel);
+      await refreshUsbChannel(channel);
 
-      const name = value === USBPPH.GPIO_ON ? "ON" :
-                   value === USBPPH.GPIO_OFF ? "OFF" :
-                   "TOGGLE";
-      log(`Port ${channel + 1} ${name}`);
+      const action =
+        value === USBPPH.GPIO_ON ? "ON" :
+          value === USBPPH.GPIO_OFF ? "OFF" :
+            "TOGGLE";
+
+      logTo("usb", `Port ${channel + 1} ${action}`);
     }
 
-    async function refreshChannel(channel) {
+    async function refreshUsbChannel(channel) {
       const data = await usbControlIn(USBPPH.REQ_GPIO_READ, 0, channel, 1);
-      state.channelState[channel] = data[0] ? 1 : 0;
-      updateChannelUI();
-      return state.channelState[channel];
+      state.usbChannelState[channel] = data[0] ? 1 : 0;
+      updateUsbChannelUI();
+      return state.usbChannelState[channel];
     }
 
-    async function refreshAllChannels() {
+    async function refreshAllUsbChannels() {
       for (let i = 0; i < 3; i++) {
-        await refreshChannel(i);
+        await refreshUsbChannel(i);
       }
-      log(`通道状态：${state.channelState.map(v => v === 1 ? "ON" : "OFF").join(", ")}`);
+
+      logTo("usb", `通道状态：${state.usbChannelState.map(v => v === 1 ? "ON" : "OFF").join(", ")}`);
     }
 
-    async function allChannels(value) {
+    async function setAllUsbChannels(value) {
       for (let i = 0; i < 3; i++) {
-        await setChannel(i, value);
+        await setUsbChannel(i, value);
       }
     }
 
     async function connectSerial() {
       assertWebSerial();
+      await enterSerialMode();
 
       const port = await navigator.serial.requestPort({
-        filters: [
-          {
-            usbVendorId: USBPPH.vid,
-            usbProductId: USBPPH.pid,
-          },
-        ],
+        filters: [{
+          usbVendorId: USBPPH.vid,
+          usbProductId: USBPPH.pid,
+        }],
       });
 
       await port.open({
@@ -868,38 +1398,10 @@
       state.serialPort = port;
       state.serialWriter = port.writable.getWriter();
 
-      updateInfo();
-      log("CDC 串口已连接");
+      updateSerialInfo();
+      logTo("serial", "已连接 CDC 串口：115200 8N1，无流控");
 
       startSerialReadLoop();
-    }
-
-    async function disconnectSerial() {
-      if (state.serialReader) {
-        try {
-          await state.serialReader.cancel();
-        } catch (_) {}
-        try {
-          state.serialReader.releaseLock();
-        } catch (_) {}
-        state.serialReader = null;
-      }
-
-      if (state.serialWriter) {
-        try {
-          state.serialWriter.releaseLock();
-        } catch (_) {}
-        state.serialWriter = null;
-      }
-
-      if (state.serialPort) {
-        try {
-          await state.serialPort.close();
-        } catch (_) {}
-        state.serialPort = null;
-      }
-
-      updateInfo();
     }
 
     async function startSerialReadLoop() {
@@ -913,17 +1415,14 @@
           try {
             while (true) {
               const { value, done } = await reader.read();
+
               if (done) {
                 break;
               }
 
               if (value) {
                 const text = decoder.decode(value);
-                log(text.trimEnd(), "rx");
-
-                if (text.includes("feilong,USBPPH,")) {
-                  el.infoFirmware.textContent = text.trim();
-                }
+                handleSerialReceivedText(text);
               }
             }
           } finally {
@@ -931,7 +1430,50 @@
           }
         }
       } catch (err) {
-        log(`串口读取结束：${err.message}`, "error");
+        if (state.serialPort) {
+          logTo("serial", `串口读取异常：${err.message || err}`, "error");
+        }
+      }
+    }
+
+    function handleSerialReceivedText(text) {
+      logTo("serial", text.trimEnd(), "rx");
+      state.serialLineBuffer += text;
+
+      let idx;
+      while ((idx = state.serialLineBuffer.search(/\r?\n/)) >= 0) {
+        const line = state.serialLineBuffer.slice(0, idx).trim();
+        state.serialLineBuffer = state.serialLineBuffer.slice(
+          state.serialLineBuffer[idx] === "\r" && state.serialLineBuffer[idx + 1] === "\n" ? idx + 2 : idx + 1
+        );
+
+        if (line) {
+          handleSerialLine(line);
+        }
+      }
+    }
+
+    function handleSerialLine(line) {
+      el.serialInfoLast.textContent = line;
+
+      if (line.includes("feilong,USBPPH,")) {
+        el.serialInfoFirmware.textContent = line;
+        return;
+      }
+
+      if (/^[01],[01],[01]$/.test(line)) {
+        const parts = line.split(",").map(v => Number(v));
+        state.serialChannelState = parts;
+        updateSerialChannelUI();
+        return;
+      }
+
+      if (/^[01]$/.test(line)) {
+        /*
+         * 单通道查询无法可靠知道对应哪个通道，除非记录最后发送命令。
+         * 这里不猜测，避免 UI 显示错误。
+         */
+        return;
       }
     }
 
@@ -941,107 +1483,119 @@
       }
 
       const text = command.endsWith("\n") ? command : command + "\n";
-      const data = new TextEncoder().encode(text);
-
-      await state.serialWriter.write(data);
-      log(text.trimEnd(), "tx");
+      await state.serialWriter.write(new TextEncoder().encode(text));
+      logTo("serial", text.trimEnd(), "tx");
     }
 
-    async function sendIdn() {
-      await serialSend("*IDN?");
-    }
-
-    async function disconnectAll() {
-      await disconnectSerial();
-      await disconnectUsb();
-      updateInfo();
-      log("已断开连接");
-    }
-
-    async function runSafely(fn) {
+    async function runSafely(fn, target = "usb") {
       try {
         await fn();
       } catch (err) {
-        log(err.message || String(err), "error");
+        logTo(target, err.message || String(err), "error");
+      } finally {
+        updateUsbInfo();
+        updateSerialInfo();
       }
     }
 
     function bindEvents() {
-      el.btnConnectUsb.addEventListener("click", () => runSafely(connectUsb));
-      el.btnConnectSerial.addEventListener("click", () => runSafely(connectSerial));
-      el.btnDisconnect.addEventListener("click", () => runSafely(disconnectAll));
-      el.btnRefresh.addEventListener("click", () => runSafely(refreshAllChannels));
-
-      el.btnAllOn.addEventListener("click", () => runSafely(() => allChannels(USBPPH.GPIO_ON)));
-      el.btnAllOff.addEventListener("click", () => runSafely(() => allChannels(USBPPH.GPIO_OFF)));
-
-      el.btnIdn.addEventListener("click", () => runSafely(sendIdn));
-      el.btnClearLog.addEventListener("click", () => {
-        el.terminal.textContent = "";
+      document.querySelectorAll(".tab-button").forEach(btn => {
+        btn.addEventListener("click", () => setTab(btn.dataset.tab));
       });
 
-      el.btnSendCmd.addEventListener("click", () => {
-        const cmd = el.cmdInput.value.trim();
+      $("usb-connect").addEventListener("click", () => runSafely(connectUsb, "usb"));
+      $("usb-refresh").addEventListener("click", () => runSafely(refreshAllUsbChannels, "usb"));
+      $("usb-all-on").addEventListener("click", () => runSafely(() => setAllUsbChannels(USBPPH.GPIO_ON), "usb"));
+      $("usb-all-off").addEventListener("click", () => runSafely(() => setAllUsbChannels(USBPPH.GPIO_OFF), "usb"));
+      $("usb-disconnect").addEventListener("click", () => runSafely(disconnectUsb, "usb"));
+
+      document.querySelectorAll("[data-usb-on]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          runSafely(() => setUsbChannel(Number(btn.dataset.usbOn), USBPPH.GPIO_ON), "usb");
+        });
+      });
+
+      document.querySelectorAll("[data-usb-off]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          runSafely(() => setUsbChannel(Number(btn.dataset.usbOff), USBPPH.GPIO_OFF), "usb");
+        });
+      });
+
+      document.querySelectorAll("[data-usb-toggle]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          runSafely(() => setUsbChannel(Number(btn.dataset.usbToggle), USBPPH.GPIO_TOGGLE), "usb");
+        });
+      });
+
+      document.querySelectorAll("[data-usb-read]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          runSafely(() => refreshUsbChannel(Number(btn.dataset.usbRead)), "usb");
+        });
+      });
+
+      $("serial-connect").addEventListener("click", () => runSafely(connectSerial, "serial"));
+      $("serial-idn").addEventListener("click", () => runSafely(() => serialSend("*IDN?"), "serial"));
+      $("serial-query-all").addEventListener("click", () => runSafely(() => serialSend("OUTP:ALL?"), "serial"));
+      $("serial-all-on").addEventListener("click", () => runSafely(() => serialSend("OUTP:ALL ON"), "serial"));
+      $("serial-all-off").addEventListener("click", () => runSafely(() => serialSend("OUTP:ALL OFF"), "serial"));
+      $("serial-disconnect").addEventListener("click", () => runSafely(disconnectSerial, "serial"));
+
+      $("serial-send").addEventListener("click", () => {
+        const cmd = el.serialInput.value.trim();
         if (!cmd) return;
-        runSafely(() => serialSend(cmd));
+        runSafely(() => serialSend(cmd), "serial");
       });
 
-      el.cmdInput.addEventListener("keydown", (ev) => {
+      el.serialInput.addEventListener("keydown", ev => {
         if (ev.key === "Enter") {
-          el.btnSendCmd.click();
+          $("serial-send").click();
         }
       });
 
-      document.querySelectorAll("[data-on]").forEach((btn) => {
+      document.querySelectorAll("[data-serial-cmd]").forEach(btn => {
         btn.addEventListener("click", () => {
-          const ch = Number(btn.dataset.on);
-          runSafely(() => setChannel(ch, USBPPH.GPIO_ON));
+          const cmd = btn.dataset.serialCmd;
+          runSafely(() => serialSend(cmd), "serial");
         });
       });
 
-      document.querySelectorAll("[data-off]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const ch = Number(btn.dataset.off);
-          runSafely(() => setChannel(ch, USBPPH.GPIO_OFF));
+      if ("usb" in navigator) {
+        navigator.usb.addEventListener("disconnect", event => {
+          if (state.usbDevice && event.device === state.usbDevice) {
+            state.usbDevice = null;
+            state.usbChannelState = [null, null, null];
+            updateUsbInfo();
+            updateUsbChannelUI();
+            logTo("usb", "WebUSB 设备已拔出", "error");
+          }
         });
-      });
-
-      document.querySelectorAll("[data-toggle]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const ch = Number(btn.dataset.toggle);
-          runSafely(() => setChannel(ch, USBPPH.GPIO_TOGGLE));
-        });
-      });
-
-      navigator.usb?.addEventListener("disconnect", (event) => {
-        if (state.usbDevice && event.device === state.usbDevice) {
-          state.usbDevice = null;
-          state.channelState = [null, null, null];
-          updateChannelUI();
-          updateInfo();
-          log("WebUSB 设备已拔出", "error");
-        }
-      });
+      }
     }
 
     function init() {
       bindEvents();
-      updateInfo();
-      updateChannelUI();
+      updateUsbInfo();
+      updateSerialInfo();
+      updateUsbChannelUI();
+      updateSerialChannelUI();
 
-      log("USBPPH Web Console 已启动");
-      log(`目标设备 VID=0x${USBPPH.vid.toString(16)}, PID=0x${USBPPH.pid.toString(16)}`);
+      logTo("usb", "USBPPH WebUSB 页面已启动");
+      logTo("usb", `目标设备 VID=0x${USBPPH.vid.toString(16)}, PID=0x${USBPPH.pid.toString(16)}`);
+
+      logTo("serial", "USBPPH CDC 串口页面已启动");
+      logTo("serial", "默认串口参数：115200 8N1，无流控");
 
       if (!("usb" in navigator)) {
-        log("当前浏览器不支持 WebUSB，通道按钮不可用", "error");
+        logTo("usb", "当前浏览器不支持 WebUSB", "error");
       }
 
       if (!("serial" in navigator)) {
-        log("当前浏览器不支持 Web Serial，命令终端不可用", "error");
+        logTo("serial", "当前浏览器不支持 Web Serial", "error");
       }
     }
 
     init();
   </script>
 </body>
+
 </html>
